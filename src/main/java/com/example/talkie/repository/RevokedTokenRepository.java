@@ -1,3 +1,4 @@
+// com/example/talkie/repository/RevokedTokenRepository.java
 package com.example.talkie.repository;
 
 import com.example.talkie.entity.RevokedToken;

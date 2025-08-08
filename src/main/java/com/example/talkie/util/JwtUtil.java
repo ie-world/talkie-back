@@ -1,3 +1,4 @@
+// com/example/talkie/util/JwtUtil.java
 package com.example.talkie.util;
 
 import io.jsonwebtoken.Claims;
@@ -24,7 +25,6 @@ public class JwtUtil {
     @Value("${jwt.exp-min:60}")
     private long expMin;
 
-    /* ====== create ====== */
     public String createToken(String username) {
         Instant now = Instant.now();
         Instant exp = now.plus(expMin, ChronoUnit.MINUTES);
@@ -34,26 +34,24 @@ public class JwtUtil {
                 .setId(UUID.randomUUID().toString())           // jti
                 .setIssuedAt(Date.from(now))
                 .setExpiration(Date.from(exp))
-                .signWith(key(), SignatureAlgorithm.HS256)     // 0.11.x
+                .signWith(key(), SignatureAlgorithm.HS256)
                 .compact();
     }
 
-    /* ====== getters ====== */
-    public String getUsername(String bearer) {
-        return parse(bearer).getBody().getSubject();
+    public String getUsername(String bearerOrToken) {
+        return parse(bearerOrToken).getBody().getSubject();
     }
 
-    public String getJti(String bearer) {
-        return parse(bearer).getBody().getId();
+    public String getJti(String bearerOrToken) {
+        return parse(bearerOrToken).getBody().getId();
     }
 
-    public Instant getExpiry(String bearer) {
-        return parse(bearer).getBody().getExpiration().toInstant();
+    public Instant getExpiry(String bearerOrToken) {
+        return parse(bearerOrToken).getBody().getExpiration().toInstant();
     }
 
-    /* ====== internal ====== */
-    private Jws<Claims> parse(String bearer) {
-        String token = stripBearer(bearer);
+    private Jws<Claims> parse(String bearerOrToken) {
+        String token = stripBearer(bearerOrToken);
         return Jwts.parserBuilder()
                 .setSigningKey(key())
                 .build()
