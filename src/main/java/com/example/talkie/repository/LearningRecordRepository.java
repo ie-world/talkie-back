@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.time.LocalDateTime;
 
 public interface LearningRecordRepository extends JpaRepository<LearningRecord, Long> {
 
@@ -27,4 +28,20 @@ public interface LearningRecordRepository extends JpaRepository<LearningRecord, 
             @Param("userId") Long userId,
             @Param("stage") String stage
     );
+           
+    // 완료( success=true ) 개수
+    @Query(value = """
+      select count(*) from LearningRecord lr
+      join LearningContent c on c.learing_content_id = lr.learning_content_id
+      where lr.user_id=:userId and c.stage=:stage and lr.success=1
+      """, nativeQuery = true)
+    long countDone(@Param("userId") int userId, @Param("stage") String stage);
+
+    // 마지막 학습 시각
+    @Query(value = """
+      select max(lr.recorded_at) from LearningRecord lr
+      join LearningContent c on c.learing_content_id = lr.learning_content_id
+      where lr.user_id=:userId and c.stage=:stage
+      """, nativeQuery = true)
+    LocalDateTime lastStudiedAt(@Param("userId") int userId, @Param("stage") String stage);
 }
