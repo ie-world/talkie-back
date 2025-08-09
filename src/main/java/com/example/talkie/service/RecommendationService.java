@@ -2,7 +2,7 @@
 package com.example.talkie.service;
 
 import com.example.talkie.dto.RecommendResponse;
-import com.example.talkie.entity.LearningContentEntity;
+import com.example.talkie.entity.LearningContent;
 import com.example.talkie.repository.LearningContentRepository;
 import com.example.talkie.repository.LearningRecordRepository;
 import com.example.talkie.repository.UserRepository;
@@ -36,9 +36,9 @@ public class RecommendationService {
         final double ratio;      // learned/total
         final double weight;     // 추천 가중치
         final Long days;         // 마지막 학습 이후 일수(null 가능)
-        final LearningContentEntity next; // 다음 학습 후보(없으면 null)
+        final LearningContent next; // 다음 학습 후보(없으면 null)
 
-        Stat(String stage, int learned, int total, double ratio, double weight, Long days, LearningContentEntity next) {
+        Stat(String stage, int learned, int total, double ratio, double weight, Long days, LearningContent next) {
             this.stage = stage;
             this.learned = learned;
             this.total = total;
@@ -78,7 +78,7 @@ public class RecommendationService {
 
             // 다음 학습 후보(미완료 1개, 없으면 랜덤 복습 1개)
             var nextList = contentRepo.findFirstUnlearned(userId, stage, PageRequest.of(0, 1));
-            LearningContentEntity next = nextList.isEmpty()
+            LearningContent next = nextList.isEmpty()
                     ? contentRepo.pickAny(stage, PageRequest.of(0, 1)).stream().findFirst().orElse(null)
                     : nextList.get(0);
 
@@ -109,7 +109,7 @@ public class RecommendationService {
     }
 
     private RecommendResponse.Card toCard(Stat s) {
-        Integer nextId = (s.next == null) ? null : s.next.getId();
+        Long nextId = (s.next == null) ? null : s.next.getLearningContentId();
         String nextText = (s.next == null) ? null : s.next.getContentText();
         String nextImg = (s.next == null) ? null : s.next.getImageUrl();
         String title = StageText.title(s.stage);

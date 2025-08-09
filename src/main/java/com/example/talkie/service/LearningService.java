@@ -1,5 +1,7 @@
 package com.example.talkie.service;
 
+import com.example.talkie.entity.User;
+import com.example.talkie.repository.UserRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -8,11 +10,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.example.talkie.entity.User;
 import com.example.talkie.entity.LearningContent;
 import com.example.talkie.entity.LearningRecord;
 
-import com.example.talkie.repository.UserRepository;
 import com.example.talkie.repository.LearningContentRepository;
 import com.example.talkie.repository.LearningRecordRepository;
 
