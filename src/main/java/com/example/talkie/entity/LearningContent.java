@@ -1,38 +1,37 @@
-// src/main/java/com/example/talkie/entity/User.java
-
 package com.example.talkie.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import jakarta.persistence.Id;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "user")
+@Table(name="learning_content")
 @Getter
-@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class User {
-
+public class LearningContent {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long userId;
+    @Column(name = "learning_content_id")
+    private Long learningContentId;
 
-    // 회원 ID (중복 불가)
-    @Column(nullable = false, unique = true, length = 15)
-    private String username;
+    @Column(name = "stage", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private Stage stage;
 
-    // 테스트 목적: 평문 저장(운영 금지)
-    @Column(nullable=false, length=100)
-    private String password;
+    @Column(name = "content_text", nullable = false)
+    private String contentText;
 
-    // 가입일(없을 수 있음)
-    @Column(name = "joined_at")
-    private LocalDateTime joinedAt;
+    @Column(name = "image_url")
+    private String imageUrl;
+
+    @Column(name = "audio_url")
+    private String audioUrl;
 
     @CreatedDate
     @Column(name = "created_at")
@@ -41,5 +40,8 @@ public class User {
     @LastModifiedDate
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
+
+    public enum Stage {
+        image, word, sentence
+    }
 }
-// DB 트리거/디폴트(now)로 채워지는 컬럼
