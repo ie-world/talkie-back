@@ -1,3 +1,4 @@
+// com/example/talkie/dto/UserResponse.java
 package com.example.talkie.dto;
 
 import lombok.AllArgsConstructor;

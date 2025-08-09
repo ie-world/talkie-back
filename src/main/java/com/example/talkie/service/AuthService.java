@@ -11,7 +11,6 @@ import com.example.talkie.repository.UserRepository;
 import com.example.talkie.util.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.*;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,7 +22,6 @@ import java.util.*;
 public class AuthService {
     private final UserRepository userRepository;
     private final RevokedTokenRepository revokedTokenRepository;
-    private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
 
     public ResponseEntity<?> signup(SignupRequest req) {
@@ -33,7 +31,8 @@ public class AuthService {
         }
         var user = User.builder()
                 .username(req.getUsername())
-                .password(passwordEncoder.encode(req.getPassword()))
+                // 테스트용: 해싱 없이 평문 저장(운영 금지)
+                .password(req.getPassword())
                 .build();
         userRepository.save(user);
         return ResponseEntity.ok(Map.of("message", "회원가입이 완료되었습니다."));
@@ -50,7 +49,9 @@ public class AuthService {
             return unauthorized();
         }
         var user = userOpt.get();
-        if (!passwordEncoder.matches(req.getPassword(), user.getPassword())) {
+
+        // 평문 비교
+        if (!Objects.equals(req.getPassword(), user.getPassword())) {
             return unauthorized();
         }
 
@@ -90,7 +91,8 @@ public class AuthService {
                     .body(Map.of("message", "사용자를 찾을 수 없습니다."));
         }
         var user = userOpt.get();
-        if (!passwordEncoder.matches(req.getPassword(), user.getPassword())) {
+        // 평문 비교
+        if (!Objects.equals(req.getPassword(), user.getPassword())) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(Map.of("message", "비밀번호가 일치하지 않습니다."));
         }
