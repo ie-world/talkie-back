@@ -1,3 +1,4 @@
+// com/example/talkie/repository/UserRepository.java
 package com.example.talkie.repository;
 
 import com.example.talkie.entity.User;

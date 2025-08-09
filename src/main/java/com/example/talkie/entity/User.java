@@ -1,4 +1,5 @@
 // src/main/java/com/example/talkie/entity/User.java
+
 package com.example.talkie.entity;
 
 import jakarta.persistence.*;
@@ -30,5 +31,6 @@ public class User {
     // 가입일(없을 수 있음)
     @Column(name = "joined_at")
     private LocalDateTime joinedAt;
+
 }
 // DB 트리거/디폴트(now)로 채워지는 컬럼

@@ -1,11 +1,14 @@
+// com/example/talkie/controller/AuthController.java
 package com.example.talkie.controller;
 
 import com.example.talkie.dto.DeleteAccountRequest;
 import com.example.talkie.dto.LoginRequest;
 import com.example.talkie.dto.SignupRequest;
 import com.example.talkie.service.AuthService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -15,38 +18,39 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping("/signup")
-    public ResponseEntity<?> signup(@RequestBody SignupRequest req) {
+    public ResponseEntity<?> signup(@Valid @RequestBody SignupRequest req) {
         return authService.signup(req);
     }
 
-    @GetMapping("/check-username/{username}")
-    public ResponseEntity<?> checkUsername(@PathVariable String username) {
+    // /api/auth/check-username?username=abc
+    @GetMapping("/check-username")
+    public ResponseEntity<?> checkUsername(@RequestParam String username) {
         return authService.checkUsername(username);
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody LoginRequest req) {
+    public ResponseEntity<?> login(@Valid @RequestBody LoginRequest req) {
         return authService.login(req);
     }
 
-    @GetMapping("/user")
-    public ResponseEntity<?> getUser(@RequestHeader("Authorization") String token) {
-        // Bearer 토큰에서 username 추출하는 로직이 필요합니다
-        String username = token.substring(7); // "Bearer " 이후의 문자열
-        return authService.getUser(username);
+    // 로그인 필요
+    @GetMapping("/me")
+    public ResponseEntity<?> me() {
+        String username = (String) SecurityContextHolder.getContext()
+                .getAuthentication().getPrincipal();
+        return authService.me(username);
     }
 
+    // 토큰 블랙리스트 등록
     @PostMapping("/logout")
     public ResponseEntity<?> logout(@RequestHeader("Authorization") String token) {
-        String username = token.substring(7);
-        return authService.logout(username);
+        return authService.logout(token);
     }
 
     @DeleteMapping("/user")
-    public ResponseEntity<?> deleteAccount(
-            @RequestHeader("Authorization") String token,
-            @RequestBody DeleteAccountRequest req) {
-        String username = token.substring(7);
+    public ResponseEntity<?> deleteAccount(@RequestBody @Valid DeleteAccountRequest req) {
+        String username = (String) SecurityContextHolder.getContext()
+                .getAuthentication().getPrincipal();
         return authService.deleteAccount(username, req);
     }
 }

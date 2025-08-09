@@ -1,55 +1,71 @@
+// com/example/talkie/jwt/JwtAuthenticationFilter.java
 package com.example.talkie.jwt;
 
+import com.example.talkie.repository.RevokedTokenRepository;
+import com.example.talkie.util.JwtUtil;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.security.core.Authentication;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.util.AntPathMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.List;
 
+@RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-    private final JwtTokenProvider jwtTokenProvider;
+    private final JwtUtil jwtUtil;
+    private final RevokedTokenRepository revokedRepo;
 
-    public JwtAuthenticationFilter(JwtTokenProvider jwtTokenProvider) {
-        this.jwtTokenProvider = jwtTokenProvider;
-    }
+    private static final List<String> PUBLICS = List.of(
+            "/api/auth/signup",
+            "/api/auth/login",
+            "/api/auth/check-username",
+            "/api/auth/check-username/**"
+    );
+    private final AntPathMatcher matcher = new AntPathMatcher();
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+    protected void doFilterInternal(HttpServletRequest req, HttpServletResponse res, FilterChain chain)
             throws ServletException, IOException {
 
-        String uri = request.getRequestURI();
-
-        // 회원가입, 로그인 등의 public 경로는 토큰 검증 건너뛰기
+        String uri = req.getRequestURI();
         if (isPublic(uri)) {
-            filterChain.doFilter(request, response);
+            chain.doFilter(req, res);
             return;
         }
 
-        String token = resolveToken(request);
-
-        if (token != null && jwtTokenProvider.validateToken(token)) {
-            Authentication auth = jwtTokenProvider.getAuthentication(token);
-            SecurityContextHolder.getContext().setAuthentication(auth);
+        String auth = req.getHeader("Authorization");
+        if (auth == null || !auth.startsWith("Bearer ")) {
+            res.setStatus(HttpStatus.UNAUTHORIZED.value());
+            return;
         }
 
-        filterChain.doFilter(request, response);
-    }
+        try {
+            String jti = jwtUtil.getJti(auth);
+            if (revokedRepo.existsByJti(jti)) {
+                res.setStatus(HttpStatus.UNAUTHORIZED.value()); // blacklisted
+                return;
+            }
 
-    private String resolveToken(HttpServletRequest request) {
-        String bearerToken = request.getHeader("Authorization");
-        if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
-            return bearerToken.substring(7);
+            String username = jwtUtil.getUsername(auth);
+            var authentication = new UsernamePasswordAuthenticationToken(
+                    username, null, List.of() // ROLE 사용시 채우기
+            );
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+            chain.doFilter(req, res);
+        } catch (Exception e) {
+            res.setStatus(HttpStatus.UNAUTHORIZED.value());
         }
-        return null;
     }
 
-    // public 경로 체크
     private boolean isPublic(String uri) {
-        return uri.startsWith("/api/auth/");
+        return PUBLICS.stream().anyMatch(p -> matcher.match(p, uri));
     }
 }
