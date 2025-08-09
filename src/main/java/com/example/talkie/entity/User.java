@@ -4,11 +4,13 @@ package com.example.talkie.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
 
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "User")
+@Table(name = "user")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -18,7 +20,7 @@ public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long userId;
 
     // 회원 ID (중복 불가)
     @Column(nullable = false, unique = true, length = 15)
@@ -32,5 +34,12 @@ public class User {
     @Column(name = "joined_at")
     private LocalDateTime joinedAt;
 
+    @CreatedDate
+    @Column(name = "created_at")
+    private LocalDateTime createdAt;
+
+    @LastModifiedDate
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
 }
 // DB 트리거/디폴트(now)로 채워지는 컬럼

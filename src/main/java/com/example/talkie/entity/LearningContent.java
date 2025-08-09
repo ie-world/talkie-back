@@ -9,7 +9,7 @@ import org.springframework.data.annotation.LastModifiedDate;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name="LearningContent")
+@Table(name="learning_content")
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor

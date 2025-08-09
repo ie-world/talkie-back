@@ -3,16 +3,18 @@ package com.example.talkie.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
 
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "freetalk_history")
+@Table(name = "free_talk_history")
 @Getter @Setter
 @NoArgsConstructor @AllArgsConstructor @Builder
 public class FreeTalkHistory {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long freeTalkHistoryId;
 
     private String username;
     private String topicName;
@@ -23,5 +25,10 @@ public class FreeTalkHistory {
     @Column(length = 2000)
     private String aiResponse;
 
-    private LocalDateTime timestamp;
-}
+    @CreatedDate
+    @Column(name = "created_at")
+    private LocalDateTime createdAt;
+
+    @LastModifiedDate
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;}

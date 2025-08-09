@@ -17,7 +17,7 @@ public class StudySummaryService {
 
     public StudySummaryResponse summary(String username) {
         var user = userRepo.findByUsername(username).orElseThrow();
-        int userId = Math.toIntExact(user.getId());
+        int userId = Math.toIntExact(user.getUserId());
         int days = studyRepo.countAttendanceDays(userId);
         int today = studyRepo.todayMinutes(userId, LocalDate.now());
         int total = studyRepo.totalMinutes(userId);

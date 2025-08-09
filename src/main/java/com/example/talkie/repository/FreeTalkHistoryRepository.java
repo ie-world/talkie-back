@@ -7,5 +7,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface FreeTalkHistoryRepository extends JpaRepository<FreeTalkHistory, Long> {
-    List<FreeTalkHistory> findByUsernameOrderByTimestampAsc(String username);
+    List<FreeTalkHistory> findByUsernameOrderByCreatedAtAsc(String username);
 }

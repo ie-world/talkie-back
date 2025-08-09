@@ -45,7 +45,7 @@ public class LearningService {
         User user = userOpt.get();
 
         // 유저가 이전에 학습한 콘텐츠
-        List<Long> excludedIds = learningRecordRepository.findLearningContentIdsByUserId(user.getId());
+        List<Long> excludedIds = learningRecordRepository.findLearningContentIdsByUserId(user.getUserId());
 
         // 제외하고 랜덤 10개
         List<LearningContent> learningContents = getRandomContentsByStage(excludedIds, stage);
@@ -54,7 +54,7 @@ public class LearningService {
         List<LearningRecord> records = learningContents.stream()
                 .map(c -> {
                     LearningRecord lr = new LearningRecord();
-                    lr.setUserId(user.getId());
+                    lr.setUserId(user.getUserId());
                     lr.setLearningContentId(c.getLearningContentId()); // 또는 getLearningContentId() 필드명에 맞게
                     return lr;
                 })
@@ -73,7 +73,7 @@ public class LearningService {
         }
         User user = userOpt.get();
 
-        LearningRecord learningRecord = learningRecordRepository.findOneByUserIdAndAndStage(user.getId(), stage);
+        LearningRecord learningRecord = learningRecordRepository.findOneByUserIdAndAndStage(user.getUserId(), stage);
         LearningContent learningContent = learningContentRepository.findById(learningRecord.getLearningContentId()).get();
 
         return ResponseEntity.ok(learningContent);

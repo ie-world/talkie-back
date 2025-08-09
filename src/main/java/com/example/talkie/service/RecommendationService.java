@@ -51,7 +51,7 @@ public class RecommendationService {
 
     public RecommendResponse recommend(String username) {
         var user = userRepo.findByUsername(username).orElseThrow();
-        int userId = Math.toIntExact(user.getId());
+        int userId = Math.toIntExact(user.getUserId());
 
         List<Stat> stats = new ArrayList<>();
 

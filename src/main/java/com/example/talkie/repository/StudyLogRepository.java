@@ -1,13 +1,13 @@
 // src/main/java/com/example/talkie/repository/StudyLogRepository.java
 package com.example.talkie.repository;
 
-import com.example.talkie.entity.StudyLogEntity;
+import com.example.talkie.entity.StudyLog;
 import org.springframework.data.jpa.repository.*;
 import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDate;
 
-public interface StudyLogRepository extends JpaRepository<StudyLogEntity, Integer> {
+public interface StudyLogRepository extends JpaRepository<StudyLog, Integer> {
 
     @Query(value = "select count(distinct date) from StudyLog where user_id=:userId", nativeQuery = true)
     int countAttendanceDays(@Param("userId") int userId);

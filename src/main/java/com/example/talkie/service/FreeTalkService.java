@@ -24,7 +24,7 @@ public class FreeTalkService {
             throw new IllegalArgumentException("Invalid type: " + type);
         }
         return topicRepo.findByType(type).stream()
-                .map(t -> new TopicResponse(t.getId(), t.getName(), t.getType()))
+                .map(t -> new TopicResponse(t.getTopicId(), t.getName(), t.getType()))
                 .collect(Collectors.toList());
     }
 
@@ -58,12 +58,12 @@ public class FreeTalkService {
                 .topicName("TODO: 현재 활성 토픽 이름")
                 .userInput(userInput)
                 .aiResponse(aiResponse)
-                .timestamp(LocalDateTime.now())
+                .createdAt(LocalDateTime.now())
                 .build());
     }
 
     public List<FreeTalkHistory> getHistory(String username) {
-        return historyRepo.findByUsernameOrderByTimestampAsc(username);
+        return historyRepo.findByUsernameOrderByCreatedAtAsc(username);
     }
 
     public void endSession(String username) {
