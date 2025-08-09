@@ -26,8 +26,8 @@ public class User {
     @Column(nullable = false, unique = true, length = 15)
     private String username;
 
-    // 비밀번호(BCrypt 해시 길이 고려)
-    @Column(nullable = false, length = 60)
+    // 테스트 목적: 평문 저장(운영 금지)
+    @Column(nullable=false, length=100)
     private String password;
 
     // 가입일(없을 수 있음)
